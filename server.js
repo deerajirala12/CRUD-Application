@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config(); // optional if using .env
 
 const itemRoutes = require('./itemRoutes');
@@ -12,8 +13,17 @@ const PORT = process.env.PORT || 5000;
 // Configure middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API routes
 app.use('/api/items', itemRoutes);
-app.use(express.static('public'));
+
+// Serve index.html for root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Connect to MongoDB and start server only after successful connection
 mongoose.connect(process.env.MONGO_URI, {
